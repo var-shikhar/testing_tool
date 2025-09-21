@@ -1,0 +1,11 @@
+fastapi
+flask
+openpyxl
+python-dotenv
+openai
+uvicorn
+aiofiles
+google-generativeai
+mcp
+pandas
+httpx
