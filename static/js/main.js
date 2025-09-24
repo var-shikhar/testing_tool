@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     // --- Delete & Export ---
     deleteBtn.addEventListener('click', async () => {
         const selectedIds = Array.from(document.querySelectorAll('.tc-checkbox:checked')).map(cb => cb.value);
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // EXECUTION TAB LOGIC
     // =====================================================================
     let executionEventSource; // Keep a separate EventSource for the execution tab
-    
+
     // --- Drag & Drop ---
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             connectExecutionWebSocket(data.run_id);
         } catch (error) {
             statusMessage.textContent = `Error: ${error.message}`;
-            loader.classList.add('hidden'); 
+            loader.classList.add('hidden');
             uploadForm.classList.remove('hidden');
         }
     }
@@ -275,8 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function connectExecutionWebSocket(runId) {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         // **** THE FIX IS HERE: Changed /executions/ to /execution/ ****
-        const ws = new WebSocket(`${wsProtocol}//${window.location.host}/execution/ws/${runId}`);
-        
+        const ws = new WebSocket(`${wsProtocol}//127.0.0.1:8000/execution/ws/${runId}`);
+
         ws.onopen = () => console.log('Execution WebSocket connection established.');
 
         ws.onmessage = (event) => handleExecutionWebSocketMessage(JSON.parse(event.data));
@@ -350,9 +350,9 @@ document.addEventListener('DOMContentLoaded', () => {
             chatEventSource.close();
         }
         chatEventSource = new EventSource(`/chat/chat_stream/${chatClientId}`);
-        
+
         chatEventSource.onopen = () => console.log("Chat SSE connection opened.");
-        
+
         chatEventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'audio_response_data') { return; }
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         if (text) formData.append('text_input', text);
         if (audioBlob) formData.append('audio_file', audioBlob, 'user_audio.webm');
-        
+
         userInput.value = '';
 
         try {
@@ -391,21 +391,21 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage(`Network Error: ${error.message}`, 'error');
         }
     }
-    
+
     function addChatMessage(message, type = 'bot') {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${type}-message`);
         let p = document.createElement('p');
         if (typeof message === 'object' && message !== null) {
-             p.innerHTML = `<pre>${JSON.stringify(message, null, 2)}</pre>`;
+            p.innerHTML = `<pre>${JSON.stringify(message, null, 2)}</pre>`;
         } else {
-             p.innerHTML = (message || "").replace(/\n/g, '<br>');
+            p.innerHTML = (message || "").replace(/\n/g, '<br>');
         }
         messageDiv.appendChild(p);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
-    
+
     // --- Event Listeners for Chat ---
     sendButton.addEventListener('click', () => sendChatMessage(userInput.value.trim()));
     userInput.addEventListener('keypress', (e) => {

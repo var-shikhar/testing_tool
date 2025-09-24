@@ -1,0 +1,38 @@
+### Project Plan: Simplified AI Test Case Generator
+
+#### Objective
+Create a minimal web application that allows users to input a prompt (text description of a feature or requirement) and uses AI (OpenAI GPT) to generate structured test cases in JSON format. The app should have a simple web UI for input/output, store test cases in JSON, and allow export to Excel. No execution or browser automation—just generation.
+
+#### Scope (Features to Include)
+- Web UI: Single page with textarea for prompt input, button to generate, display generated test cases (heading, steps, verification).
+- Backend: API endpoint to receive prompt, call OpenAI GPT-4 to generate test case JSON.
+- Storage: Save/load test cases to/from JSON file (test_cases.json).
+- Export: Button to export test cases to Excel (.xlsx).
+- No chat, no execution, no WebSockets, no MCP—just generation.
+
+#### Tech Stack Decisions
+- **Framework Choice: FastAPI vs Flask**
+  - Original project uses both: Flask for generation endpoints (mounted under /generate), FastAPI for main app/WebSockets.
+  - For this simplified version (generation only), we can use **one framework**. Recommendation: **FastAPI**.
+  - **Reasons to choose FastAPI over Flask**:
+    - **Async Support**: FastAPI is async-first, better for AI API calls (non-blocking, handles concurrent requests).
+    - **Auto Documentation**: Built-in Swagger UI (/docs) for API testing without extra setup.
+    - **Type Hints & Validation**: Pydantic models for request/response validation, reducing errors.
+    - **Performance**: Faster for I/O-bound tasks like API calls; modern, scalable.
+    - **Ecosystem**: Integrates well with async libraries; easier to add features later (e.g., if we expand to execution).
+    - **Flask Benefits (why not use it)**: Simpler for small apps, more flexible routing. But for AI integration and future-proofing, FastAPI wins. Flask lacks async natively, requiring async extensions.
+  - **Conclusion**: Use FastAPI only. No need for Flask mounting—keep it simple.
+
+#### Additional Questions/Decisions
+- **AI Model**: Use GPT-4-turbo-preview (as in original) for generation. Prompt template: "Generate test case in JSON with keys 'heading', 'steps', 'verification'. Steps as one per line."
+- **UI**: Use plain HTML/JS (no frameworks like React). Serve static files.
+- **Dependencies**: fastapi, uvicorn, openai, openpyxl, python-multipart (for file handling if needed).
+- **Environment**: Load OPENAI_API_KEY from .env.
+- **File Structure**: Minimal—main.py (app), templates/index.html, static/css/styles.css, static/js/main.js.
+- **Security**: Basic—validate inputs, no auth for now.
+- **Testing**: Manual testing via UI/docs.
+
+#### Next Steps
+- Confirm this plan.
+- Once confirmed, I'll start coding: Create files, implement generation endpoint, UI, etc.
+- Run with `uvicorn main:app --reload`.

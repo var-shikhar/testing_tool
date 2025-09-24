@@ -11,6 +11,7 @@ import json
 import io
 import asyncio
 import logging
+import re
 from datetime import datetime
 
 # --- FastAPI & Web Server Imports ---
@@ -49,7 +50,7 @@ logging.getLogger("mcp.client.session").setLevel(logging.INFO)
 logging.getLogger("api_routes").setLevel(logging.INFO)
 
 # --- FastAPI App Initialization ---
-app = FastAPI(title="CodeFire AI Testing Suite")
+app = FastAPI(title="Online Eternals AI Testing Suite")
 
 # ==============================================================================
 # 2. STARTUP & SHUTDOWN EVENTS (for MCP Manager)
@@ -121,12 +122,63 @@ def generate_test_cases_from_text():
     data = request.get_json()
     user_text = data.get('text', '')
     additional_instructions = data.get('additional_instructions', '')
-    prompt = f"""You are an expert QA engineer. Generate a test case in JSON format with keys "heading", "steps", and "verification". The steps should be one per line. Use the provided instructions and primary requirements. IMPORTANT INSTRUCTIONS: \"\"\"{additional_instructions}\"\"\" PRIMARY REQUIREMENT: \"\"\"{user_text}\"\"\" JSON Output:"""
+    prompt = f"""
+        You are an expert QA engineer. Generate a test case in JSON format using the exact structure below.  
+        **Output ONLY valid JSON. Do not add explanations, comments, or extra text.**
+
+        **JSON structure:**
+        {{
+            "heading": "string",
+            "steps": "step 1\nstep 2\nstep 3\n...",
+            "steps": ["step 1", "step 2", "step 3", "..."],
+            "verification": ["verification 1", "verification 2", "..."]
+        }}
+
+        **Instructions:**
+        1. Generate the "heading" based on the primary requirement, summarizing the test case in 3–6 words.
+        2. Each "step" must be a single, clear, imperative action.
+        3. In the "steps" string, separate each step with a newline character `\n`.
+        4. Steps must follow the logical order implied by the PRIMARY REQUIREMENT.
+        5. "verification" entries must clearly state what should be verified after performing the steps.
+        6. Do not include extra examples, comments, or explanations.
+        7. Maintain the JSON structure exactly as shown; do not add or remove keys.
+        8. Make the output deterministic. If using an API, set temperature=0.
+
+        PRIMARY REQUIREMENT: {user_text}
+        IMPORTANT INSTRUCTIONS: {additional_instructions}
+
+        Output JSON only.
+    """
+    
+
     try:
-        completion = client.chat.completions.create(model="gpt-4-turbo-preview", messages=[{"role": "system", "content": "You are an AI assistant that generates test cases in a strict JSON format with keys 'heading', 'steps', and 'verification'."}, {"role": "user", "content": prompt}], temperature=0.5, response_format={"type": "json_object"})
-        test_case_data = json.loads(completion.choices[0].message.content)
-        if not all(k in test_case_data for k in ["heading", "steps", "verification"]): raise ValueError("Generated JSON is missing required keys.")
-        return jsonify(test_case_data)
+        completion = client.chat.completions.create(
+            model="gpt-oss-latest", 
+            messages=[{"role": "system", "content": "You are an AI assistant that generates test cases in a strict JSON format with keys 'heading', 'steps', and 'verification'."}, {"role": "user", "content": prompt}], 
+            temperature=0.5, 
+            response_format=None
+        )
+        
+        clean_content = re.sub(r"^```json\s*|\s*```$", "", completion.choices[0].message.content.strip(), flags=re.MULTILINE) 
+        
+        # Return empty if model returned nothing or empty string
+        if not clean_content or clean_content.strip() == "":
+            return []
+
+        # Try Parse JSON safely
+        try:
+            test_case_data = json.loads(clean_content)
+            print("JSON RESPONSE", test_case_data)
+        except json.JSONDecodeError:
+            flask_app.logger.error("Invalid JSON returned by model: %s", clean_content)
+            return []
+
+        # Validate required keys
+        if all(k in test_case_data for k in ["heading", "steps", "verification"]):
+            return jsonify(test_case_data)
+        else:
+            flask_app.logger.error("Generated JSON missing required keys: %s", test_case_data)
+            return []
     except Exception as e:
         flask_app.logger.error(f"Error generating test case: {e}")
         return jsonify({"error": str(e)}), 500
@@ -228,8 +280,8 @@ async def read_root(request: Request):
 if __name__ == "__main__":
     import uvicorn
     logger.info("--- Starting Web testing agent---")
-    
-    
-    uvicorn.run("main_web_app:app", host="0.0.0.0", port=8000, timeout_graceful_shutdown=1,reload=True)
+
+
+    uvicorn.run("main_web_app:app", host="0.0.0.0", port=8000, timeout_graceful_shutdown=1,reload=False)
 
 # --- END OF MERGED main.py --- 

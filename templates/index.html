@@ -1,152 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeFire AI Agent Testing Suite</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Eternals AI Agent Testing Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
     <!-- Image Modal -->
     <div id="modal-backdrop">
-        <div id="modal-content">
-            <span id="close-modal">×</span>
-            <img id="modal-image" alt="Enlarged Screenshot">
-        </div>
+      <div id="modal-content">
+        <span id="close-modal">×</span>
+        <img id="modal-image" alt="Enlarged Screenshot" />
+      </div>
     </div>
 
     <div class="page-container">
-        <header>
-            <div class="logo-container">
-                <img src="https://codefire.org/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.474e4238.png&w=640&q=75" alt="CodeFire Logo">
-                <h1>AI Agent Testing Suite</h1>
-            </div>
-        </header>
+      <header>
+        <div class="logo-container">
+          <img
+            src="https://tse1.mm.bing.net/th/id/OIF.N93QIMMQ8khhsl03wIeHHg?rs=1&pid=ImgDetMain&o=7&rm=3"
+            alt="Online Eternals Logo"
+          />
+          <h1>AI Agent Testing Suite</h1>
+        </div>
+      </header>
 
-        <!-- Tab Navigation -->
-        <div class="tabs">
-            <button class="tab-link active" data-tab="generation-tab"><i class="fa-solid fa-wand-magic-sparkles"></i> Test Case Generation</button>
-            <button class="tab-link" data-tab="execution-tab"><i class="fa-solid fa-rocket"></i> Test Run Execution</button>
-            <button class="tab-link" data-tab="chat-tab"><i class="fa-solid fa-comments"></i> Interactive Chat</button>
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-link active" data-tab="generation-tab">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Test Case Generation
+        </button>
+        <button class="tab-link" data-tab="execution-tab">
+          <i class="fa-solid fa-rocket"></i> Test Run Execution
+        </button>
+        <button class="tab-link" data-tab="chat-tab">
+          <i class="fa-solid fa-comments"></i> Interactive Chat
+        </button>
+      </div>
+
+      <main>
+        <!-- ======================= GENERATION TAB ======================= -->
+        <div id="generation-tab" class="tab-content active">
+          <div class="generation-grid">
+            <!-- Left Column: Inputs -->
+            <div class="input-column">
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-book"></i> Global Instructions</h3>
+                </div>
+                <div class="card-body">
+                  <textarea
+                    id="instructions-area"
+                    placeholder="Enter reusable instructions here (e.g., base URL, login credentials)..."
+                  ></textarea>
+                  <button id="save-instructions-btn" class="button-primary">
+                    <i class="fa-solid fa-save"></i> Save Instructions
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3>
+                    <i class="fa-solid fa-bullseye"></i> Primary Requirement
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <textarea
+                    id="requirement-area"
+                    placeholder="Describe the feature or user story to test..."
+                  ></textarea>
+                  <button id="generate-btn" class="button-primary">
+                    <i class="fa-solid fa-robot"></i> Generate Test Case
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Right Column: Generated Output -->
+            <div class="output-column">
+              <div class="card">
+                <div class="card-header">
+                  <h3>
+                    <i class="fa-solid fa-file-alt"></i> Generated Test Case
+                  </h3>
+                  <div id="tc-loader" class="spinner-small hidden"></div>
+                </div>
+                <div class="card-body">
+                  <input
+                    type="text"
+                    id="generated-heading"
+                    placeholder="Test Case Heading will appear here"
+                  />
+                  <textarea
+                    id="generated-steps"
+                    placeholder="Test Steps will appear here..."
+                  ></textarea>
+                  <textarea
+                    id="generated-verification"
+                    placeholder="Verification Steps will appear here..."
+                  ></textarea>
+                  <div class="pass-status-container">
+                    <label for="pass-status-select">Pass Status:</label>
+                    <select id="pass-status-select">
+                      <option value="">Optional</option>
+                      <option value="M">Mandatory</option>
+                    </select>
+                  </div>
+                  <button id="save-tc-btn" class="button-secondary" disabled>
+                    <i class="fa-solid fa-plus-circle"></i> Save to List
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Saved Test Cases List -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-list-check"></i> Saved Test Cases</h3>
+              <div class="list-actions">
+                <button id="export-btn" class="button-secondary">
+                  <i class="fa-solid fa-file-export"></i> Export Selected
+                </button>
+                <button id="delete-btn" class="button-danger">
+                  <i class="fa-solid fa-trash"></i> Delete Selected
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="test-case-list-container">
+                <!-- Table will be injected here -->
+              </div>
+            </div>
+          </div>
         </div>
 
-        <main>
-            <!-- ======================= GENERATION TAB ======================= -->
-            <div id="generation-tab" class="tab-content active">
-                <div class="generation-grid">
-                    <!-- Left Column: Inputs -->
-                    <div class="input-column">
-                        <div class="card">
-                            <div class="card-header"><h3><i class="fa-solid fa-book"></i> Global Instructions</h3></div>
-                            <div class="card-body">
-                                <textarea id="instructions-area" placeholder="Enter reusable instructions here (e.g., base URL, login credentials)..."></textarea>
-                                <button id="save-instructions-btn" class="button-primary"><i class="fa-solid fa-save"></i> Save Instructions</button>
-                                
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header"><h3><i class="fa-solid fa-bullseye"></i> Primary Requirement</h3></div>
-                            <div class="card-body">
-                                <textarea id="requirement-area" placeholder="Describe the feature or user story to test..."></textarea>
-                                <button id="generate-btn" class="button-primary"><i class="fa-solid fa-robot"></i> Generate Test Case</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Right Column: Generated Output -->
-                    <div class="output-column">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3><i class="fa-solid fa-file-alt"></i> Generated Test Case</h3>
-                                <div id="tc-loader" class="spinner-small hidden"></div>
-                            </div>
-                            <div class="card-body">
-                                <input type="text" id="generated-heading" placeholder="Test Case Heading will appear here">
-                                <textarea id="generated-steps" placeholder="Test Steps will appear here..."></textarea>
-                                <textarea id="generated-verification" placeholder="Verification Steps will appear here..."></textarea>
-                                <div class="pass-status-container">
-                                    <label for="pass-status-select">Pass Status:</label>
-                                    <select id="pass-status-select">
-                                        <option value="">Optional</option>
-                                        <option value="M">Mandatory</option>
-                                    </select>
-                                </div>
-                                <button id="save-tc-btn" class="button-secondary" disabled><i class="fa-solid fa-plus-circle"></i> Save to List</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Saved Test Cases List -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-list-check"></i> Saved Test Cases</h3>
-                        <div class="list-actions">
-                            <button id="export-btn" class="button-secondary"><i class="fa-solid fa-file-export"></i> Export Selected</button>
-                            <button id="delete-btn" class="button-danger"><i class="fa-solid fa-trash"></i> Delete Selected</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="test-case-list-container">
-                            <!-- Table will be injected here -->
-                        </div>
-                    </div>
-                </div>
+        <!-- ======================= EXECUTION TAB ======================= -->
+        <div id="execution-tab" class="tab-content">
+          <div id="upload-card-exec" class="card">
+            <form id="upload-form">
+              <div id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                <p>
+                  <strong>Drag & Drop</strong> an exported .xlsx file here to
+                  run tests
+                </p>
+                <span>or</span>
+                <label for="file-input" class="file-label">Browse Files</label>
+                <input
+                  type="file"
+                  id="file-input"
+                  name="file"
+                  accept=".xlsx"
+                  hidden
+                />
+              </div>
+            </form>
+            <div id="loader" class="hidden">
+              <div class="spinner"></div>
+              <p>Starting test run...</p>
             </div>
+          </div>
 
-            <!-- ======================= EXECUTION TAB ======================= -->
-            <div id="execution-tab" class="tab-content">
-                <div id="upload-card-exec" class="card">
-                    <form id="upload-form">
-                        <div id="drop-zone">
-                            <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
-                            <p><strong>Drag & Drop</strong> an exported .xlsx file here to run tests</p>
-                            <span>or</span>
-                            <label for="file-input" class="file-label">Browse Files</label>
-                            <input type="file" id="file-input" name="file" accept=".xlsx" hidden>
-                        </div>
-                    </form>
-                    <div id="loader" class="hidden">
-                        <div class="spinner"></div>
-                        <p>Starting test run...</p>
-                    </div>
-                </div>
+          <div id="results-section" class="hidden">
+            <div id="status-card" class="card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-chart-line"></i> Run Status</h3>
+              </div>
+              <div class="card-body">
+                <p id="status-message">Waiting for file...</p>
+                <div id="download-link-container"></div>
+              </div>
+            </div>
+            <div id="log-card" class="card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-terminal"></i> Live Execution Log</h3>
+              </div>
+              <div id="log-container"></div>
+            </div>
+          </div>
+        </div>
+        <!-- ======================= CHAT TAB (NEW) ======================= -->
 
-                <div id="results-section" class="hidden">
-                    <div id="status-card" class="card">
-                        <div class="card-header"><h3><i class="fa-solid fa-chart-line"></i> Run Status</h3></div>
-                        <div class="card-body">
-                            <p id="status-message">Waiting for file...</p>
-                            <div id="download-link-container"></div>
-                        </div>
-                    </div>
-                    <div id="log-card" class="card">
-                        <div class="card-header"><h3><i class="fa-solid fa-terminal"></i> Live Execution Log</h3></div>
-                        <div id="log-container"></div>
-                    </div>
-                </div>
+        <div id="chat-tab" class="tab-content">
+          <div class="chat-container">
+            <div id="chat-box" class="chat-box">
+              <div class="message bot-message">
+                <p>Welcome! Describe a task or test you'd like to perform.</p>
+              </div>
             </div>
-             <!-- ======================= CHAT TAB (NEW) ======================= -->
-              
-            <div id="chat-tab" class="tab-content">
-                <div class="chat-container">
-                    <div id="chat-box" class="chat-box">
-                        <div class="message bot-message"><p>Welcome! Describe a task or test you'd like to perform.</p></div>
-                    </div>
-                    <div class="input-area">
-                        <textarea id="userInput" placeholder="Type your message or use voice..."></textarea>
-                        <button id="sendButton" class="button-primary"><i class="fa-solid fa-paper-plane"></i></button>
-                        <button id="recordButton" class="button-secondary">🎤</button>
-                    </div>
-                    <div id="recordingStatus"></div>
-                </div>
+            <div class="input-area">
+              <textarea
+                id="userInput"
+                placeholder="Type your message or use voice..."
+              ></textarea>
+              <button
+                type="button"
+                id="sendButton"
+                class="button-primary"
+                title="Send message"
+              >
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+              <button id="recordButton" class="button-secondary">🎤</button>
             </div>
-        </main>
+            <div id="recordingStatus"></div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <script src="/static/js/main.js"></script>
-</body>
+  </body>
 </html>

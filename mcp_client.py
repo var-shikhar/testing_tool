@@ -297,6 +297,19 @@ class MCPManager:
         
         try:
             tool_args = json.loads(tool_args_str)
+            
+            # SV Force headful browser for launchBrowser tool
+            if category == "browser" and original_tool_name == "launchBrowser":
+                if "options" not in tool_args or not isinstance(tool_args["options"], dict):
+                    tool_args["options"] = {}
+                tool_args["options"]["headless"] = False
+                
+            tool_exec_result = await asyncio.wait_for(
+                session.call_tool(original_tool_name, tool_args),
+                timeout=self.tool_exec_timeout
+            )
+            # Till Here
+
             logger.info(f"Executing tool '{original_tool_name}' on MCP '{category}' with args: {tool_args}")
 
             # Original code had a commented-out pre-hover logic. If needed, re-implement here.
